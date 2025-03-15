@@ -11,6 +11,22 @@ const schema = a.schema({
     .model({
       content: a.string(),
     }).authorization(allow => [allow.owner()]),
+    
+  // ドキュメントモデルの追加
+  Document: a
+    .model({
+      name: a.string(),
+      key: a.string(), // S3内のキー
+      size: a.integer(),
+      type: a.string(),
+      uploadDate: a.datetime(),
+      status: a.string(), // 分析中、問題なし、要確認、問題あり
+      userId: a.string(), // ユーザーID
+    })
+    .authorization(allow => [
+      // 所有者のみがアクセス可能
+      allow.owner()
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

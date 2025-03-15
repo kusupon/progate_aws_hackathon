@@ -239,6 +239,40 @@
   color: var(--dark-gray);
 }
 
+/* ファイル詳細情報 */
+.file-details {
+  margin-bottom: 1.5rem;
+  background-color: var(--light-gray);
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-item .label {
+  font-weight: bold;
+  width: 150px;
+  color: var(--secondary-color);
+}
+
+.detail-item .value {
+  flex-grow: 1;
+}
+
+.file-actions {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
 .analysis-message {
   color: #666;
   font-style: italic;
@@ -253,6 +287,25 @@
   text-align: center;
   padding: 2rem;
   font-weight: 500;
+}
+
+/* ローディング表示 */
+.loading {
+  color: var(--primary-color);
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.loading::after {
+  content: "...";
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: "."; }
+  40% { content: ".."; }
+  60%, 100% { content: "..."; }
 }
 
 /* レスポンシブ対応 */
@@ -305,4 +358,28 @@
   .file-name-display .label {
     margin-bottom: 0.5rem;
   }
+  
+  .detail-item {
+    flex-direction: column;
+  }
+  
+  .detail-item .label {
+    width: 100%;
+    margin-bottom: 0.3rem;
+  }
+}
+
+.document-action {
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.btn-delete {
+  background-color: var(--danger-color);
+  color: white;
 }
