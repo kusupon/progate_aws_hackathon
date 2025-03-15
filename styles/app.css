@@ -1,0 +1,308 @@
+/* 全体のスタイル */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --success-color: #2ecc71;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --light-gray: #f5f5f5;
+  --dark-gray: #333;
+  --border-color: #ddd;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ヘッダー部分 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h1 {
+  margin: 0;
+  color: var(--secondary-color);
+  font-size: 1.8rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* ボタンスタイル */
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-upload {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-small {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* アップロードセクション */
+.upload-section {
+  background-color: var(--light-gray);
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.upload-section h2 {
+  margin-top: 0;
+  color: var(--secondary-color);
+}
+
+.file-upload {
+  display: flex;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-label {
+  padding: 0.6rem 1.2rem;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 1rem;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+/* 文書リストセクション */
+.documents-section {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.documents-section h2 {
+  margin-top: 0;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.no-documents {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.documents-list {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.document-header {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
+  background-color: var(--light-gray);
+  padding: 1rem;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.document-item {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.document-item:last-child {
+  border-bottom: none;
+}
+
+.document-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.document-name {
+  font-weight: 500;
+  color: var(--dark-gray);
+}
+
+.document-date {
+  color: #666;
+}
+
+.document-status {
+  font-weight: 500;
+}
+
+/* ステータスに応じた色分け */
+.status-問題なし .document-status {
+  color: var(--success-color);
+}
+
+.status-要確認 .document-status {
+  color: var(--warning-color);
+}
+
+.status-問題あり .document-status {
+  color: var(--danger-color);
+}
+
+.status-分析中 .document-status {
+  color: var(--primary-color);
+}
+
+/* 結果ページのスタイル */
+.result-section {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.file-info {
+  margin-bottom: 2rem;
+}
+
+.file-info h2 {
+  margin-top: 0;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.file-name-display {
+  background-color: var(--light-gray);
+  padding: 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.file-name-display .label {
+  font-weight: bold;
+  margin-right: 1rem;
+  color: var(--secondary-color);
+}
+
+.file-name-display .value {
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+}
+
+.analysis-message {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--light-gray);
+  border-radius: 6px;
+}
+
+.no-file {
+  color: var(--danger-color);
+  text-align: center;
+  padding: 2rem;
+  font-weight: 500;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-buttons {
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  .file-upload {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .file-label {
+    margin-right: 0;
+    margin-bottom: 1rem;
+    max-width: none;
+  }
+  
+  .document-header, .document-item {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  
+  .document-action {
+    display: none;
+  }
+  
+  .document-item {
+    position: relative;
+  }
+  
+  .document-item::after {
+    content: ">";
+    position: absolute;
+    right: 1rem;
+    color: #ccc;
+  }
+  
+  .file-name-display {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .file-name-display .label {
+    margin-bottom: 0.5rem;
+  }
+}
