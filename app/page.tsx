@@ -3,10 +3,11 @@
 import "../styles/app.css";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 
+// コンポーネントのインポート
 import Header from "./components/Header";
 import UploadForm from "./components/UploadForm";
 import DocumentList from "./components/DocumentList";
@@ -16,8 +17,8 @@ export default function App() {
   const userName = user.signInDetails?.loginId?.split('@')[0];
   const userId = user?.userId;
   
-  // データクライアントの生成
-  const client = generateClient<Schema>();
+  // データクライアントの生成（useRefを使用して再レンダリング時に再生成されないようにする）
+  const clientRef = useRef(generateClient<Schema>());
   
   // ドキュメント一覧
   const [uploadedDocuments, setUploadedDocuments] = useState<any[]>([]);
@@ -28,7 +29,7 @@ export default function App() {
     const fetchDocuments = async () => {
       try {
         // データベースからユーザーのドキュメント一覧を取得
-        const response = await client.models.Document.list();
+        const response = await clientRef.current.models.Document.list();
         setUploadedDocuments(response.data.map(doc => ({
           id: doc.id,
           name: doc.name,
@@ -44,7 +45,7 @@ export default function App() {
     };
 
     fetchDocuments();
-  }, [client.models.Document]);
+  }, [userId]); // userId が変わった時だけ再取得
 
   // アップロード成功時のハンドラー
   const handleUploadSuccess = (newDocument: any) => {

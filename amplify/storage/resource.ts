@@ -16,4 +16,11 @@ export const storage = defineStorage({
 });
 
 // クライアント側で使用するスキーマの型定義
-export type StorageSchema = typeof storage; 
+export type StorageSchema = typeof storage;
+
+// 注意: S3バケットの暗号化設定はAWS管理コンソールから変更してください
+// 1. AWSコンソールにログイン
+// 2. S3サービスに移動
+// 3. プロジェクトのバケットを選択
+// 4. 「プロパティ」タブ→「デフォルトの暗号化」を編集
+// 5. 「Amazon S3 マネージドキー (SSE-S3)」を選択 
