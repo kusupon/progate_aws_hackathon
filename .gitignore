@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/amplify/functions/documentProcessor/node_modules
 /.pnp
 .pnp.js
 .yarn/install-state.gz

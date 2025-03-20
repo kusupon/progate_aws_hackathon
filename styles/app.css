@@ -367,6 +367,14 @@
     width: 100%;
     margin-bottom: 0.3rem;
   }
+  
+  .text-comparison {
+    grid-template-columns: 1fr;
+  }
+  
+  .original-text, .corrected-text {
+    margin-bottom: 1rem;
+  }
 }
 
 .document-action {
@@ -382,4 +390,97 @@
 .btn-delete {
   background-color: var(--danger-color);
   color: white;
+}
+
+/* 評価結果のスタイル */
+.analysis-results {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: var(--light-gray);
+  border-radius: 6px;
+}
+
+.analysis-results h2 {
+  margin-top: 0;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.evaluation-score {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.evaluation-score h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+}
+
+.score {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.text-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.original-text, .corrected-text {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.original-text h3, .corrected-text h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+  font-size: 1rem;
+}
+
+.text-content {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.evaluation-issues {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.evaluation-issues h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+}
+
+.issue-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.issue-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.issue-problem {
+  margin-bottom: 0.5rem;
+}
+
+.issue-suggestion {
+  color: var(--primary-color);
 }

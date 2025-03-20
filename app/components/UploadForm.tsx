@@ -34,24 +34,14 @@ export default function UploadForm({ userId, onUploadSuccess }: UploadFormProps)
     try {
       // ファイル名から拡張子を取得
       const fileExtension = selectedFile.name.split('.').pop() || '';
+
+      const encodedFileName = Date.now() + '_' + 
+      selectedFile.name.replace(/[^\x00-\x7F]/g, '_');
       
       // S3のキーを生成（ユーザーIDをプレフィックスとして使用）
-      const key = `private/${userId}/${Date.now()}_${selectedFile.name}`;
+      const key = `private/${userId}/${encodedFileName}`;
       
-      // S3にファイルをアップロード
-      const result = await uploadData({
-        path: key,
-        data: selectedFile,
-        options: {
-          contentType: selectedFile.type,
-          metadata: {
-            userId: userId,
-            fileName: selectedFile.name
-          }
-        }
-      });
-      
-      // データベースにドキュメント情報を保存
+      // まずデータベースにドキュメント情報を保存
       const documentResult = await client.models.Document.create({
         name: selectedFile.name,
         key: key,
@@ -62,22 +52,40 @@ export default function UploadForm({ userId, onUploadSuccess }: UploadFormProps)
         userId: userId
       });
       
-      // 新しいドキュメントをリストに追加
-      if (documentResult.data) {
-        const newDocument = {
-          id: documentResult.data.id,
-          name: selectedFile.name,
-          date: new Date().toISOString().split('T')[0],
-          status: "分析中",
-          key: key
-        };
-        
-        onUploadSuccess(newDocument);
-        setSelectedFile(null);
-        
-        // アップロード完了後、result.tsxに遷移
-        router.push(`/result?fileName=${encodeURIComponent(selectedFile.name)}&id=${documentResult.data.id}`);
+      if (!documentResult.data) {
+        throw new Error("ドキュメント情報の保存に失敗しました");
       }
+      
+      const documentId = documentResult.data.id;
+      
+      // データベースへの保存成功後、S3にファイルをアップロード
+      await uploadData({
+        path: key,
+        data: selectedFile,
+        options: {
+          contentType: selectedFile.type,
+          metadata: {
+            userId: userId,
+            fileName: btoa(unescape(encodeURIComponent(selectedFile.name))),
+            documentId: documentId // ドキュメントIDをメタデータに含める
+          }
+        }
+      }).result;
+            
+      // 新しいドキュメントをリストに追加
+      const newDocument = {
+        id: documentId,
+        name: selectedFile.name,
+        date: new Date().toISOString().split('T')[0],
+        status: "分析中",
+        key: key
+      };
+      
+      onUploadSuccess(newDocument);
+      setSelectedFile(null);
+      
+      // アップロード完了後、result.tsxに遷移
+      router.push(`/result?fileName=${encodeURIComponent(selectedFile.name)}&id=${documentId}`);
       
     } catch (error) {
       console.error("ファイルのアップロードに失敗しました", error);
