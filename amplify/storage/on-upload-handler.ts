@@ -13,7 +13,7 @@ const docClient = DynamoDBDocumentClient.from(ddbClient);
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // DynamoDBテーブル名 - Amplifyが自動生成した名前 (必要に応じて環境変数から取得)
-const DOCUMENT_TABLE_NAME = process.env.API_AMPLIFY_DOCUMENTTABLE_NAME || 'Document-xxxxxxxx'; 
+const DOCUMENT_TABLE_NAME = process.env.DOCUMENTTABLE_NAME; 
 
 // S3からファイルを取得し、Bufferに変換する関数
 async function getFileFromS3(bucket: string, key: string): Promise<Buffer> {

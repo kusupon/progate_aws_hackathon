@@ -15,6 +15,7 @@
     "@aws-sdk/lib-dynamodb": "^3.767.0",
     "@aws-sdk/s3-request-presigner": "^3.758.0",
     "@aws-sdk/util-dynamodb": "^3.767.0",
+    "@dotenvx/dotenvx": "^1.39.0",
     "@google/generative-ai": "^0.24.0",
     "aws-amplify": "^6.6.6",
     "next": "14.2.10",

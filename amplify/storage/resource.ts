@@ -5,8 +5,7 @@ export const onUploadHandler = defineFunction({
   entry: './on-upload-handler.ts',
   environment: {
     GEMINI_API_KEY: secret('GEMINI_API_KEY'),
-    // DynamoDBテーブルの環境変数を設定
-    API_AMPLIFY_DOCUMENTTABLE_NAME: "Document-4jditn2frfacdf5pwdcdxx44ua-NONE"
+    DOCUMENTTABLE_NAME: process.env.DOCUMENTTABLE_NAME as string
   },
   timeoutSeconds: 900,  // 15分（900秒）
   memoryMB: 1024  // MB単位
