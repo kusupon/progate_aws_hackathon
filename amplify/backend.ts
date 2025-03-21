@@ -16,6 +16,6 @@ const tableName = backend.data.resources.tables["Document"].tableName;
 new cdk.CfnOutput(backend.stack, "DocumentTableName", {
   value: tableName,
   description: "The Document DynamoDB table name",
-  exportName: "DocumentTableName",
+  exportName: "DocumentTableName-dev-branch",
 });
 
