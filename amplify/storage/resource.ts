@@ -5,7 +5,7 @@ export const onUploadHandler = defineFunction({
   entry: './on-upload-handler.ts',
   environment: {
     GEMINI_API_KEY: secret('GEMINI_API_KEY'),
-    DOCUMENTTABLE_NAME: process.env.DOCUMENTTABLE_NAME as string
+    DOCUMENTTABLE_NAME: process.env.DOCUMENTTABLE_NAME || 'Document-xxxxxxxx'
   },
   timeoutSeconds: 900,  // 15分（900秒）
   memoryMB: 1024  // MB単位
