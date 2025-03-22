@@ -12,7 +12,7 @@ const docClient = DynamoDBDocumentClient.from(ddbClient);
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-const DOCUMENT_TABLE_NAME = process.env.DOCUMENTTABLE_NAME;
+const DOCUMENT_TABLE_NAME = process.env.DOCUMENT_TABLENAME;
 
 // S3からファイルを取得し、Bufferに変換する関数
 async function getFileFromS3(bucket: string, key: string): Promise<Buffer> {
@@ -100,7 +100,6 @@ async function saveAnalysisResult(documentId: string, analysisResult: any): Prom
     console.log(`分析結果をドキュメントID ${documentId} に保存します`);
     
     // 分析結果からフィールドを抽出
-    let originalText = '';
     let evaluationScore = 0;
     let evaluationIssues = '';
     let correctedText = '';
@@ -129,9 +128,7 @@ async function saveAnalysisResult(documentId: string, analysisResult: any): Prom
         resultJson = cleanResult;
       }
       
-      // フィールドを取得
-      originalText = resultJson.original_text || '';
-      
+      // フィールドを取得      
       if (resultJson.evaluation) {
         evaluationScore = resultJson.evaluation.score || 0;
         evaluationIssues = JSON.stringify(resultJson.evaluation.issues || []);
@@ -141,11 +138,6 @@ async function saveAnalysisResult(documentId: string, analysisResult: any): Prom
     } catch (e) {
       console.error('JSON解析エラー:', e);
       // JSONでない場合は元のテキストをそのまま使用
-      if (typeof analysisResult === 'string') {
-        originalText = analysisResult;
-      } else {
-        originalText = JSON.stringify(analysisResult);
-      }
     }
     
     // DynamoDBの更新パラメータ
@@ -155,12 +147,11 @@ async function saveAnalysisResult(documentId: string, analysisResult: any): Prom
         id: documentId
       },
       // 予約語である"status"をExpressionAttributeNamesで置き換え
-      UpdateExpression: "set originalText = :ot, evaluationScore = :es, evaluationIssues = :ei, correctedText = :ct, analysisResult = :ar, #docStatus = :st",
+      UpdateExpression: "set evaluationScore = :es, evaluationIssues = :ei, correctedText = :ct, analysisResult = :ar, #docStatus = :st",
       ExpressionAttributeNames: {
         "#docStatus": "status"
       },
       ExpressionAttributeValues: {
-        ":ot": originalText,
         ":es": evaluationScore,
         ":ei": evaluationIssues,
         ":ct": correctedText,
@@ -186,33 +177,87 @@ async function transcribeWithGemini(base64Data: string, mimeType: string): Promi
     const apiKey = GEMINI_API_KEY;
 
     // Gemini APIのエンドポイントURL
-    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-    const prompt = `以下の文章を評価し、問題点を指摘した上で修正してください。
-評価基準は以下の通りです：
+    const prompt = `以下の利用規約を評価し、問題点や気をつける点を教えて下さい。
+利用者は一般の人なので、親しみやすい口調で教えてください。
+提示された文書ファイルのみを評価してください。外部知識や推測は使用せず、文書内の情報だけに基づいて回答してください。
+各問題点については、該当箇所（条項番号または具体的文章）を文書から引用してください。
+以下を参考に問題点を上げてください。但し文章の難しさは評価に含めません。:
 
-誤字脱字や文法ミスの有無
+A. 住居関連（金融面に着目）
+中途解約違約金
+  → 契約期間中の解約時に、残り期間の何割が請求されるかの条件
+更新料の発生条件と金額
+  → 自動発生する更新料の計算方法や発生タイミング
+原状回復費用の算定基準
+  → 通常使用による劣化と故意・過失の境界に関する記述
+滞納時の遅延損害金の利率
+  → 年率14.6%など、高利率設定が記載されているか
+共益費・管理費の値上げ条件
+  → 「必要に応じて」など曖昧な値上げ権限の記述
+保証会社の利用強制と手数料
+  → 契約時および更新時に発生する手数料の内容
+鍵紛失時の交換費用
+  → 鍵や防犯システム全体の交換に関する費用負担
 
-表現の自然さ・読みやすさ
+B. 通信・サブスクリプション関連
+海外ローミング料金の自動適用条件
+  → 意図せず接続しても課金対象となる条件の明示
+データ上限到達後の追加料金
+  → 自動で高額な追加パケット購入に切り替わる仕組み
+キャンペーン終了後の通常料金への自動移行
+  → 割引期間終了後の料金跳ね上がりの条件
+解約手続きの期限と違約金
+  → 解約申請の締切日を過ぎた場合の請求内容
+最低利用期間内の解約に伴う端末残債一括請求
+  → 分割払いが一括請求に切り替わる条件
+通信速度制限の具体的条件
+  → 「公平な通信環境の維持」などの名目での制限条件
 
-論理構成や文脈の適切さ
+C. AI関連サブスクリプション
+個人情報の国際移転
+  → データの保管国や、EU域外への移転に伴う法的適用条件
+入力データの利用範囲
+  → モデル学習への利用、匿名化の程度や範囲
+プラン自動更新と料金改定
+  → 事前通知なしの値上げ条件や自動更新の仕組み
+API利用量の計測基準
+  → トークン数やリクエスト数のカウント方法、超過時の課金ルール
+無料枠から有料枠への自動切替条件
+  → 利用量超過時に自動で有料プランへ移行する条件
+
+D. 金融関連
+学生ローン・奨学金
+返済猶予・減額の申請期限
+    → 申請が遅れると猶予が適用されない条件
+繰上返済手数料
+  → 一部繰上返済時に発生する手数料体系
+学生クレジットカード
+リボ払い・分割払いの自動設定
+    → 知らないうちにリボ払いに変更される可能性の有無
+海外利用時の為替手数料
+  → 表示レートに加え、追加の手数料が上乗せされる条件
+キャッシング利用時の金利
+  → 年率18～20%などの高金利設定
+年会費無料の継続条件
+  → 最低利用回数や利用金額が設定されているか
 
 評価結果は100点満点で採点してください。
-最終的な出力は必ず以下のJSONフォーマットに従ってください:
+
+必ず以下のJSONフォーマットで回答してください。JSON以外を出力しないでください:
 
 {
-  "original_text": "元の文章（文字起こし結果）",
   "evaluation": {
     "score": 点数（0〜100の整数）,
     "issues": [
       {
         "issue": "問題点の簡潔な説明",
-        "suggestion": "修正提案"
-      },
-      ...
+        "suggestion": "問題点の詳細"
+      }
     ]
   },
-  "corrected_text": "修正後の文章"
+  "corrected_text": "この文書ファイルの総合評価"
 }`;
 
     // APIリクエストのボディ
@@ -229,7 +274,7 @@ async function transcribeWithGemini(base64Data: string, mimeType: string): Promi
             }
           ]
         }
-      ]
+      ], "generationConfig": { "response_mime_type": "application/json" }
     };
 
     // Node.jsのhttpsモジュールを使用してAPIリクエストを送信
@@ -246,20 +291,30 @@ async function transcribeWithGemini(base64Data: string, mimeType: string): Promi
       };
 
       const req = https.request(options, (res) => {
-        let data = '';
+        const chunks: Buffer[] = [];
+        const decoder = new TextDecoder('utf-8');
 
         res.on('data', (chunk) => {
-          data += chunk;
+          // バイナリデータとしてchunkを蓄積
+          chunks.push(Buffer.from(chunk));
         });
 
         res.on('end', () => {
           if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
             try {
+              // すべてのチャンクを連結してから一度にデコード
+              const buffer = Buffer.concat(chunks);
+              const data = decoder.decode(buffer);
+              
               resolve(JSON.parse(data));
             } catch (e) {
               reject(new Error(`JSONの解析に失敗しました: ${e}`));
             }
           } else {
+            // エラーの場合もデコードを正しく行う
+            const buffer = Buffer.concat(chunks);
+            const data = decoder.decode(buffer);
+            
             reject(new Error(`API error: ${res.statusCode} - ${data}`));
           }
         });
@@ -332,6 +387,7 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
         // Gemini APIで文字起こし実行
         console.log(`ドキュメントID ${documentId} の分析処理を開始します`);
         const analysisResult = await transcribeWithGemini(base64Data, mimeType);
+        console.log(`分析結果: ${analysisResult}`);
 
         // DynamoDBに結果を保存
         await saveAnalysisResult(documentId, analysisResult);
@@ -347,3 +403,5 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
     console.error('エラー発生:', error instanceof Error ? error.message : String(error));
   }
 };
+
+

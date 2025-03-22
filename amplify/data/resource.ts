@@ -17,7 +17,6 @@ const schema = a.schema({
       status: a.string(), // 分析中、問題なし、要確認、問題あり
       userId: a.string(), // ユーザーID
       // 文字起こし結果と評価結果のフィールドを追加
-      originalText: a.string(), // 文字起こし元のテキスト
       evaluationScore: a.integer(), // 評価スコア（0-100）
       evaluationIssues: a.string(), // 問題点と修正提案（JSON文字列として保存）
       correctedText: a.string(), // 修正後のテキスト

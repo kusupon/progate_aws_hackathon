@@ -1,10 +1,9 @@
-import { defineStorage, defineFunction, secret } from '@aws-amplify/backend';
-import * as cdk from 'aws-cdk-lib';
+import { defineStorage, defineFunction } from '@aws-amplify/backend';
 // オンアップロードハンドラー関数を定義
 export const onUploadHandler = defineFunction({
   entry: './on-upload-handler.ts',
   environment: {
-    GEMINI_API_KEY: secret('GEMINI_API_KEY'),
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY as string,
     DOCUMENT_TABLENAME: process.env.DOCUMENTTABLE_NAME || "document-xxx"
   },
   timeoutSeconds: 900,  // 15分（900秒）

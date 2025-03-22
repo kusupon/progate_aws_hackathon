@@ -12,24 +12,26 @@ import type { Schema } from "@/amplify/data/resource";
 // 評価の問題点を表示するコンポーネント
 const EvaluationIssues = ({ issues }: { issues: any[] }) => {
   if (!issues || issues.length === 0) {
-    return <p>問題点はありません。</p>;
+    return <p className="no-issues">問題点はありません。</p>;
   }
 
   return (
     <div className="evaluation-issues">
       <h3>指摘された問題点</h3>
-      <ul>
+      <div className="issues-container">
         {issues.map((issue, index) => (
-          <li key={index} className="issue-item">
+          <div key={index} className="issue-card">
             <div className="issue-problem">
-              <strong>問題点:</strong> {issue.issue}
+              <h4>問題点</h4>
+              <p>{issue.issue}</p>
             </div>
             <div className="issue-suggestion">
-              <strong>修正提案:</strong> {issue.suggestion}
+              <h4>修正提案</h4>
+              <p>{issue.suggestion}</p>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
@@ -127,9 +129,12 @@ const Result = () => {
       
       <div className="result-section">
         {isLoading ? (
-          <p className="loading">読み込み中...</p>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">読み込み中...</p>
+          </div>
         ) : fileName ? (
-          <div className="file-info">
+          <div className="file-info-card">
             <h2>ファイル情報</h2>
             <div className="file-name-display">
               <span className="label">ファイル名:</span>
@@ -161,55 +166,55 @@ const Result = () => {
               </div>
             )}
             
-            {/* 文字起こし結果と評価結果の表示 */}
-            {documentData && documentData.originalText && (
+            {/* 分析結果の表示 */}
+            {documentData && (
               <div className="analysis-results">
                 <h2>分析結果</h2>
                 
                 {documentData.evaluationScore !== undefined && (
-                  <div className="evaluation-score">
+                  <div className="evaluation-score-card">
                     <h3>評価スコア</h3>
                     <div 
-                      className="score" 
+                      className="score-display" 
                       style={{ color: getScoreColor(documentData.evaluationScore) }}
                     >
-                      {documentData.evaluationScore} / 100
+                      <span className="score-value">{documentData.evaluationScore}</span>
+                      <span className="score-max">/ 100</span>
                     </div>
                   </div>
                 )}
                 
-                <div className="text-comparison">
-                  <div className="original-text">
-                    <h3>原文</h3>
+                {documentData.correctedText && (
+                  <div className="corrected-text-card">
+                    <h3>総合評価</h3>
                     <div className="text-content">
-                      {documentData.originalText}
+                      {documentData.correctedText}
                     </div>
                   </div>
-                  
-                  {documentData.correctedText && (
-                    <div className="corrected-text">
-                      <h3>修正後の文章</h3>
-                      <div className="text-content">
-                        {documentData.correctedText}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                )}
                 
                 <EvaluationIssues issues={evaluationIssues} />
               </div>
             )}
             
-            {documentData && !documentData.originalText && documentData.status === "分析中" && (
-              <p className="analysis-message">現在、このファイルの分析を実行中です。しばらくしてからリロードしてください。</p>
+            {documentData && documentData.status === "分析中" && (
+              <div className="analysis-message">
+                <div className="processing-icon"></div>
+                <p>現在、このファイルの分析を実行中です。しばらくしてからリロードしてください。</p>
+              </div>
             )}
             
-            {documentData && !documentData.originalText && documentData.status !== "分析中" && (
-              <p className="analysis-message">このファイルの分析結果はまだありません。</p>
+            {documentData && documentData.status !== "分析中" && evaluationIssues.length === 0 && !documentData.correctedText && (
+              <div className="analysis-message">
+                <p>このファイルの分析結果はまだありません。</p>
+              </div>
             )}
           </div>
         ) : (
-          <p className="no-file">ファイル情報が見つかりません。</p>
+          <div className="no-file-card">
+            <div className="no-file-icon"></div>
+            <p>ファイル情報が見つかりません。</p>
+          </div>
         )}
       </div>
     </div>
