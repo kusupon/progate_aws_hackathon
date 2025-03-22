@@ -114,7 +114,7 @@ async function saveAnalysisResult(documentId: string, analysisResult: any): Prom
         
         // 先頭の「json」という文字があれば削除
         cleanResult = cleanResult.replace(/^json\s*/, '');
-        
+      
         // バッククォートを削除
         cleanResult = cleanResult.replace(/^`+|`+$/g, '');
       }
