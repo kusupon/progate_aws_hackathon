@@ -484,3 +484,9 @@
 .issue-suggestion {
   color: var(--primary-color);
 }
+
+/* フッターのスタイル */
+.footer-link:hover {
+  color: #FFFFFF !important;
+  text-decoration: underline;
+}

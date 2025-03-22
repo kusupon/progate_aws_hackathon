@@ -8,31 +8,59 @@ import "../../styles/app.css";
 import { getUrl } from "aws-amplify/storage";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
+import { 
+  Flex, 
+  Heading, 
+  Card, 
+  Text, 
+  Loader, 
+  Badge, 
+  Button, 
+  Collection,
+  Divider,
+  View,
+  Rating,
+  Avatar,
+  Menu,
+  MenuItem
+} from "@aws-amplify/ui-react";
+import Header from "../components/Header";
 
 // 評価の問題点を表示するコンポーネント
 const EvaluationIssues = ({ issues }: { issues: any[] }) => {
   if (!issues || issues.length === 0) {
-    return <p className="no-issues">問題点はありません。</p>;
+    return (
+      <Card variation="elevated" padding="medium">
+        <Text fontWeight="bold">問題点はありません。</Text>
+      </Card>
+    );
   }
 
   return (
-    <div className="evaluation-issues">
-      <h3>指摘された問題点</h3>
-      <div className="issues-container">
-        {issues.map((issue, index) => (
-          <div key={index} className="issue-card">
-            <div className="issue-problem">
-              <h4>問題点</h4>
-              <p>{issue.issue}</p>
-            </div>
-            <div className="issue-suggestion">
-              <h4>修正提案</h4>
-              <p>{issue.suggestion}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <View>
+      <Heading level={4} padding="medium 0">指摘された問題点</Heading>
+      <Collection
+        type="list"
+        items={issues}
+        gap="1rem"
+      >
+        {(issue, index) => (
+          <Card key={index} variation="elevated" padding="medium">
+            <Flex direction="column" gap="0.5rem">
+              <View>
+                <Badge variation="warning">問題点</Badge>
+                <Text fontWeight="bold" marginTop="0.5rem">{issue.issue}</Text>
+              </View>
+              <Divider />
+              <View>
+                <Badge variation="info">問題の詳細</Badge>
+                <Text marginTop="0.5rem">{issue.suggestion}</Text>
+              </View>
+            </Flex>
+          </Card>
+        )}
+      </Collection>
+    </View>
   );
 };
 
@@ -47,6 +75,9 @@ const Result = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [evaluationIssues, setEvaluationIssues] = useState<any[]>([]);
   
+  // ユーザー名を取得
+  const userName = user?.signInDetails?.loginId?.split('@')[0];
+
   // データクライアントの生成
   const client = generateClient<Schema>();
 
@@ -118,106 +149,157 @@ const Result = () => {
     return "red";
   };
 
+  // スコアに基づいて評価を決定
+  const getScoreLabel = (score: number) => {
+    if (score >= 80) return "良好";
+    if (score >= 60) return "注意";
+    return "改善必要";
+  };
+
   return (
-    <div className="container">
-      <div className="header">
-        <h1>文書分析結果</h1>
-        <div className="header-buttons">
-          <Link href="/"><button className="btn btn-primary">ホームに戻る</button></Link>
-        </div>
-      </div>
+    <Flex direction="column" gap="1rem">
+      <Header userName={userName} />
       
-      <div className="result-section">
-        {isLoading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p className="loading-text">読み込み中...</p>
-          </div>
-        ) : fileName ? (
-          <div className="file-info-card">
-            <h2>ファイル情報</h2>
-            <div className="file-name-display">
-              <span className="label">ファイル名:</span>
-              <span className="value">{fileName}</span>
-            </div>
-            
-            {documentData && (
-              <div className="file-details">
-                <div className="detail-item">
-                  <span className="label">アップロード日:</span>
-                  <span className="value">{new Date(documentData.uploadDate).toLocaleString('ja-JP')}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">ファイルサイズ:</span>
-                  <span className="value">{Math.round(documentData.size / 1024)} KB</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">ステータス:</span>
-                  <span className={`value status-${documentData.status.replace(/\s+/g, '-')}`}>{documentData.status}</span>
-                </div>
-              </div>
-            )}
-            
-            {fileUrl && (
-              <div className="file-actions">
-                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                  ファイルを表示
-                </a>
-              </div>
-            )}
-            
-            {/* 分析結果の表示 */}
-            {documentData && (
-              <div className="analysis-results">
-                <h2>分析結果</h2>
+      <View padding="1rem">
+        <Flex direction="column" gap="2rem">
+          <Flex justifyContent="space-between" alignItems="center">
+            <Heading level={2}>文書分析結果</Heading>
+            <Link href="/documents">
+              <Button variation="primary" size="small">
+                マイページに戻る
+              </Button>
+            </Link>
+          </Flex>
+          
+          {isLoading ? (
+            <Flex direction="column" alignItems="center" padding="3rem">
+              <Loader size="large" />
+              <Text marginTop="1rem">読み込み中...</Text>
+            </Flex>
+          ) : fileName ? (
+            <Flex direction="column" gap="2rem">
+              <Card variation="elevated" padding="medium">
+                <Heading level={4}>ファイル情報</Heading>
+                <Divider marginBlock="1rem" />
                 
-                {documentData.evaluationScore !== undefined && (
-                  <div className="evaluation-score-card">
-                    <h3>評価スコア</h3>
-                    <div 
-                      className="score-display" 
-                      style={{ color: getScoreColor(documentData.evaluationScore) }}
-                    >
-                      <span className="score-value">{documentData.evaluationScore}</span>
-                      <span className="score-max">/ 100</span>
-                    </div>
-                  </div>
-                )}
-                
-                {documentData.correctedText && (
-                  <div className="corrected-text-card">
-                    <h3>総合評価</h3>
-                    <div className="text-content">
-                      {documentData.correctedText}
-                    </div>
-                  </div>
-                )}
-                
-                <EvaluationIssues issues={evaluationIssues} />
-              </div>
-            )}
-            
-            {documentData && documentData.status === "分析中" && (
-              <div className="analysis-message">
-                <div className="processing-icon"></div>
-                <p>現在、このファイルの分析を実行中です。しばらくしてからリロードしてください。</p>
-              </div>
-            )}
-            
-            {documentData && documentData.status !== "分析中" && evaluationIssues.length === 0 && !documentData.correctedText && (
-              <div className="analysis-message">
-                <p>このファイルの分析結果はまだありません。</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="no-file-card">
-            <div className="no-file-icon"></div>
-            <p>ファイル情報が見つかりません。</p>
-          </div>
-        )}
-      </div>
-    </div>
+                <Flex direction="column" gap="1rem">
+                  <Flex alignItems="center">
+                    <Text fontWeight="bold" width="30%">ファイル名:</Text>
+                    <Text>{fileName}</Text>
+                  </Flex>
+                  
+                  {documentData && (
+                    <>
+                      <Flex alignItems="center">
+                        <Text fontWeight="bold" width="30%">アップロード日:</Text>
+                        <Text>{new Date(documentData.uploadDate).toLocaleString('ja-JP')}</Text>
+                      </Flex>
+                      
+                      <Flex alignItems="center">
+                        <Text fontWeight="bold" width="30%">ファイルサイズ:</Text>
+                        <Text>{Math.round(documentData.size / 1024)} KB</Text>
+                      </Flex>
+                      
+                      <Flex alignItems="center">
+                        <Text fontWeight="bold" width="30%">ステータス:</Text>
+                        <Badge
+                          variation={documentData.status === "完了" ? "success" : 
+                                     documentData.status === "分析中" ? "info" : "warning"}
+                        >
+                          {documentData.status}
+                        </Badge>
+                      </Flex>
+                    </>
+                  )}
+                  
+                  {fileUrl && (
+                    <Flex marginTop="1rem" justifyContent="flex-end">
+                      <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+                        <Button variation="link">ファイルを表示</Button>
+                      </a>
+                    </Flex>
+                  )}
+                </Flex>
+              </Card>
+              
+              {/* 分析結果の表示 */}
+              {documentData && (
+                <Card variation="elevated" padding="medium">
+                  <Heading level={4}>分析結果</Heading>
+                  <Divider marginBlock="1rem" />
+                  
+                  <Flex direction="column" gap="2rem">
+                    {documentData.evaluationScore !== undefined && (
+                      <Card variation="outlined" padding="medium">
+                        <Flex direction="column" alignItems="center" gap="0.5rem">
+                          <Heading level={5}>評価スコア</Heading>
+                          <Flex alignItems="center" gap="1rem">
+                            <View 
+                              backgroundColor={getScoreColor(documentData.evaluationScore)} 
+                              color="white"
+                              padding="1rem 2rem"
+                              borderRadius="8px"
+                            >
+                              <Heading level={3} color="white" margin="0">
+                                {documentData.evaluationScore}/100
+                              </Heading>
+                            </View>
+                            <Badge size="large" variation={
+                              documentData.evaluationScore >= 80 ? "success" : 
+                              documentData.evaluationScore >= 60 ? "warning" : "error"
+                            }>
+                              {getScoreLabel(documentData.evaluationScore)}
+                            </Badge>
+                          </Flex>
+                        </Flex>
+                      </Card>
+                    )}
+                    
+                    {documentData.correctedText && (
+                      <Card variation="outlined" padding="medium">
+                        <Heading level={5}>総合評価</Heading>
+                        <Text marginTop="1rem">
+                          {documentData.correctedText}
+                        </Text>
+                      </Card>
+                    )}
+                    
+                    <EvaluationIssues issues={evaluationIssues} />
+                  </Flex>
+                </Card>
+              )}
+              
+              {documentData && documentData.status === "分析中" && (
+                <Card variation="outlined" padding="medium" backgroundColor="rgba(0, 0, 255, 0.05)">
+                  <Flex alignItems="center" gap="1rem">
+                    <Loader />
+                    <Text>現在、このファイルの分析を実行中です。しばらくしてからリロードしてください。</Text>
+                  </Flex>
+                </Card>
+              )}
+              
+              {documentData && documentData.status !== "分析中" && evaluationIssues.length === 0 && !documentData.correctedText && (
+                <Card variation="outlined" padding="medium" backgroundColor="rgba(255, 165, 0, 0.05)">
+                  <Text>このファイルの分析結果はまだありません。</Text>
+                </Card>
+              )}
+            </Flex>
+          ) : (
+            <Card variation="outlined" padding="medium" backgroundColor="rgba(255, 0, 0, 0.05)">
+              <Flex direction="column" alignItems="center" padding="2rem" gap="1rem">
+                <View fontSize="2rem">📄</View>
+                <Text>ファイル情報が見つかりません。</Text>
+                <Link href="/">
+                  <Button variation="primary" size="small">
+                    ホームに戻る
+                  </Button>
+                </Link>
+              </Flex>
+            </Card>
+          )}
+        </Flex>
+      </View>
+    </Flex>
   );
 };
 
