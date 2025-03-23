@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { 
   useAuthenticator, 
   Flex, 
@@ -40,9 +40,11 @@ export default function Header({ userName }: HeaderProps) {
               >
                 📝
               </View>
+              <Link href="/documents" style={{ textDecoration: 'none' }}>
               <Heading level={3}>
                 Contract Checker
               </Heading>
+              </Link>
             </Flex>
       
       <Flex alignItems="center" gap="0.5rem">
@@ -57,6 +59,9 @@ export default function Header({ userName }: HeaderProps) {
             </Avatar>
           }
         >
+          <MenuItem>
+          {`${userName}さん`}
+          </MenuItem>
           <MenuItem onClick={signOut}>
             ログアウト
           </MenuItem>
