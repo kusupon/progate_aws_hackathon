@@ -262,7 +262,7 @@ export default function HomePage() {
                       backgroundColor="#0066FF"
                       color="white"
                       style={{
-                        padding: "1rem",
+                        padding: "0.5rem",
                         borderRadius: "50%",
                         width: "3rem",
                         height: "3rem",
@@ -286,7 +286,7 @@ export default function HomePage() {
                       backgroundColor="#0066FF"
                       color="white"
                       style={{
-                        padding: "1rem",
+                        padding: "0.5rem",
                         borderRadius: "50%",
                         width: "3rem",
                         height: "3rem",
@@ -310,7 +310,7 @@ export default function HomePage() {
                       backgroundColor="#0066FF"
                       color="white"
                       style={{
-                        padding: "1rem",
+                        padding: "0.5rem",
                         borderRadius: "50%",
                         width: "3rem",
                         height: "3rem",
