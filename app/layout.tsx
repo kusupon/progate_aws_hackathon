@@ -1,6 +1,5 @@
 "use client";
 
-import { Inter } from "next/font/google";
 import "../styles/app.css";
 
 import { Authenticator, useAuthenticator, View } from "@aws-amplify/ui-react";
