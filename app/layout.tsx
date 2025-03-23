@@ -40,7 +40,7 @@ function AuthContent({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // 認証が必要なページにアクセスしたとき、未認証ならログインページへリダイレクト
-    if (PROTECTED_PATHS.some(path => pathname.startsWith(path)) && authStatus !== 'authenticated') {
+    if (PROTECTED_PATHS.some(path => pathname.startsWith(path)) && authStatus === 'unauthenticated') {
       router.push('/login');
     }
     

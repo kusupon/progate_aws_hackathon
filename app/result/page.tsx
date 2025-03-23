@@ -83,24 +83,27 @@ const Result = () => {
 
   useEffect(() => {
     // 認証されていない場合はホームページにリダイレクト
-    if (authStatus !== "authenticated") {
+    if (authStatus === "unauthenticated") {
       router.push("/");
       return;
     }
     
     // URLパラメータからファイル名とドキュメントIDを取得
-    const fileNameParam = searchParams.get("fileName");
-    const idParam = searchParams.get("id");
-    
-    if (fileNameParam) {
-      setFileName(decodeURIComponent(fileNameParam));
-    }
-    
-    if (idParam) {
-      setDocumentId(idParam);
-      fetchDocumentData(idParam);
-    } else {
-      setIsLoading(false);
+    if (authStatus === "authenticated" || authStatus === "configuring") {
+      // URLパラメータからファイル名とドキュメントIDを取得
+      const fileNameParam = searchParams.get("fileName");
+      const idParam = searchParams.get("id");
+      
+      if (fileNameParam) {
+        setFileName(decodeURIComponent(fileNameParam));
+      }
+      
+      if (idParam) {
+        setDocumentId(idParam);
+        fetchDocumentData(idParam);
+      } else {
+        setIsLoading(false);
+      }
     }
   }, [authStatus, router, searchParams]);
   
