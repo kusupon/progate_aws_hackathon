@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   useAuthenticator, 
   Flex, 
@@ -19,6 +20,11 @@ interface HeaderProps {
 
 export default function Header({ userName }: HeaderProps) {
   const { signOut } = useAuthenticator();
+  const router = useRouter();
+  const handleSignOut = () => {
+    signOut();
+    router.push('/');
+  };
 
   // アバターの文字を取得（ユーザー名の最初の文字）
   const avatarText = userName ? userName[0].toUpperCase() : 'G';
@@ -62,7 +68,7 @@ export default function Header({ userName }: HeaderProps) {
           <MenuItem>
           {`${userName}さん`}
           </MenuItem>
-          <MenuItem onClick={signOut}>
+          <MenuItem onClick={handleSignOut}>
             ログアウト
           </MenuItem>
         </Menu>
